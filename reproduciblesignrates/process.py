@@ -42,6 +42,10 @@ class ReproducibleSignRateInfo:
         '''
         Computes confidence interval with (1-alpha) nominal coverage probability.
         Returns a lower and upper bound for each threshold in `self.thresholds`.
+
+        Args:
+            alpha (float): one minus coverage probability
+            alternative (string): two-sided, lower-bound, or upper-bound
         '''
 
         if alternative=='two-sided':
@@ -152,3 +156,43 @@ def process_from_matrices(logrho,Yhat,Y,n_thresholds=1000):
         subexperiment_ids.ravel(),
         thresholds)
 
+def process(logrho,Yhat,Y,subexperiment_ids,n_thresholds=1000):
+    '''
+    Returns a ReproducibleSignRateInfo object, storing various properties of two
+    experimental replicates in terms of how well they agree.  Subexperiments
+    for each parameter must be given explicitly in subexperiment_ids.
+
+    If Yhat[i]==0, then parameter associated with index i is ignored (regardless of the associated rho value).
+
+    Args:
+        logrho (N vector): confidence in a null hypothesis, expressed as a log p-value (from training replicate)
+        Yhat (N vector, int): estimate of the sign of a parameter theta (from training replicate)
+        Y (N vector, int): another estimate (from testing replicate)
+        subexperiment_ids (N vector): subexperiment for each parameter
+        n_thresholds (int): number of thresholds on logrho to use
+    '''
+    logrho=np.require(logrho,dtype=float)
+    Yhat=_check_sign_format(Yhat)
+    Y=_check_sign_format(Y)
+
+    if len(logrho.shape)!=1:
+        raise ValueError("rho should be a vector")
+    if len(Yhat.shape)!=1:
+        raise ValueError("Yhat should be a vector")
+    if len(Y.shape)!=1:
+        raise ValueError("Y should be a vector")
+    if len(subexperiment_ids.shape)!=1:
+        raise ValueError("Y should be a vector")
+
+    if logrho.shape!=Yhat.shape or Yhat.shape!=Y.shape:
+        raise ValueError("rho,Yhat,Y should all have the same shape")
+
+
+    thresholds=np.r_[logrho.min():logrho.max():n_thresholds*1j]
+
+    return ReproducibleSignRateInfo(
+        logrho,
+        Yhat,
+        Y,
+        subexperiment_ids,
+        thresholds)

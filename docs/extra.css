@@ -1,0 +1,13 @@
+.doc-heading code {
+    color: #050;
+    border-bottom: 1px solid black;
+    border-left: unset;
+    border-right: unset;
+    border-top: unset;
+    background-color:unset;
+}
+
+
+.rst-content h2 {
+    margin-top: 25px;
+}
