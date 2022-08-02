@@ -18,4 +18,4 @@ $$\mathrm{RSP}(Y;\hat Y,\rho,\alpha) \triangleq \frac{|\{i:\ \hat Y_i = Y_i,\ \r
 
 In some cases each experimental procedure includes many subexperiments, and each subexperiment is approximately independent.  With subexperiments, this package can be used to also estimate confidence interval for the **Reproducible Sign Rate**, defined as $\mathrm{RSR}(\hat Y,\rho,\alpha)\triangleq \mathbb{E}_Y[\mathrm{RSP}(Y;\hat Y,\rho,\alpha)]$.
 
-Example usage can be found in [this notebook](example_usage.ipynb).
+Example usage can be found in [this notebook](example_usage.ipynb).  API documentation can be found [here](https://prob-ml.github.io/reproducible-sign-rates/).
