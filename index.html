@@ -1,0 +1,432 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="description" content="None" />
+      <link rel="shortcut icon" href="img/favicon.ico" />
+    <title>Reproducible Sign Rates</title>
+    <link rel="stylesheet" href="css/theme.css" />
+    <link rel="stylesheet" href="css/theme_extra.css" />
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/styles/github.min.css" />
+        <link href="assets/_mkdocstrings.css" rel="stylesheet" />
+        <link href="extra.css" rel="stylesheet" />
+    
+      <script>
+        // Current page data
+        var mkdocs_page_name = "Reproducible Sign Rates";
+        var mkdocs_page_input_path = "index.md";
+        var mkdocs_page_url = null;
+      </script>
+    
+    <script src="js/jquery-3.6.0.min.js" defer></script>
+    <!--[if lt IE 9]>
+      <script src="js/html5shiv.min.js"></script>
+    <![endif]-->
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/highlight.min.js"></script>
+      <script>hljs.initHighlightingOnLoad();</script> 
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
+    <div class="wy-side-scroll">
+      <div class="wy-side-nav-search">
+          <a href="." class="icon icon-home"> Reproducible Sign Rates
+        </a><div role="search">
+  <form id ="rtd-search-form" class="wy-form" action="./search.html" method="get">
+      <input type="text" name="q" placeholder="Search docs" title="Type search term here" />
+  </form>
+</div>
+      </div>
+
+      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul class="current">
+                <li class="toctree-l1 current"><a class="reference internal current" href=".">Reproducible Sign Rates</a>
+    <ul class="current">
+    </ul>
+                </li>
+              </ul>
+      </div>
+    </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+      <nav class="wy-nav-top" role="navigation" aria-label="Mobile navigation menu">
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href=".">Reproducible Sign Rates</a>
+        
+      </nav>
+      <div class="wy-nav-content">
+        <div class="rst-content"><div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href="." class="icon icon-home" alt="Docs"></a> &raquo;</li><li>Reproducible Sign Rates</li>
+    <li class="wy-breadcrumbs-aside">
+    </li>
+  </ul>
+  <hr/>
+</div>
+
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+            <div class="section" itemprop="articleBody">
+              
+                <h1 id="reproducible-sign-rates">Reproducible Sign Rates</h1>
+<p>This package is designed to analyze data from the following setting.</p>
+<ul>
+<li>We are interested in real-valued parameters $\theta_1,\theta_2 ... \theta_n$.  For example, $\theta_i$ might indicate the effect of a particular drug on a particular gene.</li>
+<li>We have designed an experimental procedure which can estimate these parameters.</li>
+<li>We have two performed the experiment twice.</li>
+</ul>
+<p>Given data of this form, we assume the user can calculate three quantities of interest for each parameter $\theta_i$.</p>
+<ol>
+<li>Use the first replicate ("the training replicate") to produce a $p$-value, denoted $\rho_i$, for null hypothesis that $\theta_i=0$.</li>
+<li>Use the training experiment to produce an object $\hat Y_i$ estimating the sign of $\theta_i$ (i.e., if the estimator is accurate, $\hat Y_i=1$ if $\theta_i&gt;0$ and $\hat Y_i=-1$ if $\theta_i&lt;0$).</li>
+<li>Use the second replicate ("the validation replicate") produce an independent estimate $Y_i$ estimating the sign of $\theta_i$.</li>
+</ol>
+<p>This package uses $\rho,\hat Y,Y$ to visualize whether the two replicates yielded the same results.  It does so using a quantity called the <strong>Reproducible Sign Proportion</strong>, defined as</p>
+<p>$\mathrm{RSP}(Y;\hat Y,\rho,\alpha) \triangleq \frac{|{i:\ \hat Y_i = Y_i,\ \rho_i\leq \alpha}|}{|{i:\ \rho_i\leq \alpha}|}$</p>
+<p>In some cases each experimental procedure includes many subexperiments, and each subexperiment is approximately independent.  With subexperiments, this package can be used to also estimate confidence interval for the <strong>Reproducible Sign Rate</strong>, defined as $\mathrm{RSR}(\hat Y,\rho,\alpha)\triangleq \mathbb{E}_Y[\mathrm{RSP}(Y;\hat Y,\rho,\alpha)]$.</p>
+<h1 id="api-documentation">API Documentation</h1>
+<h2 id="process_from_matrices">process_from_matrices</h2>
+<p>This function processes $(\log \rho, \hat Y, Y)$ into an object which can be used for further processing.  It assumes the parameters (and $\rho,\hat Y,Y$) can be organized into a matrix where the values in each row come from different subexperiments.</p>
+
+
+<div class="doc doc-object doc-function">
+
+
+<a id="reproduciblesignrates.process.process_from_matrices"></a>
+  <div class="doc doc-contents first">
+  
+      <p>Returns a ReproducibleSignRateInfo object, storing various properties of two
+experimental replicates in terms of how well they agree.  Each row of logrho, Yhat, Y is assumed
+to correspond to a different subexperiment.</p>
+<p>If Yhat[i,j]==0, then parameter associated with index i,j is ignored (regardless of the associated rho value).</p>
+
+  <p><strong>Parameters:</strong></p>
+  <table>
+    <thead>
+      <tr>
+        <th>Name</th>
+        <th>Type</th>
+        <th>Description</th>
+        <th>Default</th>
+      </tr>
+    </thead>
+    <tbody>
+        <tr>
+          <td><code>logrho</code></td>
+          <td>
+                <code>NxM matrix</code>
+          </td>
+          <td><p>confidence in a null hypothesis, expressed as a log p-value (from training replicate)</p></td>
+          <td>
+              <em>required</em>
+          </td>
+        </tr>
+        <tr>
+          <td><code>Yhat</code></td>
+          <td>
+                <code>NxM matrix, int</code>
+          </td>
+          <td><p>estimate of the sign of a parameter theta (from training replicate)</p></td>
+          <td>
+              <em>required</em>
+          </td>
+        </tr>
+        <tr>
+          <td><code>Y</code></td>
+          <td>
+                <code>NxM matrix, int</code>
+          </td>
+          <td><p>another estimate (from testing replicate)</p></td>
+          <td>
+              <em>required</em>
+          </td>
+        </tr>
+        <tr>
+          <td><code>n_thresholds</code></td>
+          <td>
+                <code>int</code>
+          </td>
+          <td><p>number of thresholds on logrho to use</p></td>
+          <td>
+                <code>1000</code>
+          </td>
+        </tr>
+    </tbody>
+  </table>
+
+  </div>
+
+</div><h2 id="process">process</h2>
+<p>This function processes $(\log \rho, \hat Y, Y)$ into an object which can be used for further processing.  To use this function, one must explicitly specify the subexperiment associated with each parameter.</p>
+
+
+<div class="doc doc-object doc-function">
+
+
+<a id="reproduciblesignrates.process.process"></a>
+  <div class="doc doc-contents first">
+  
+      <p>Returns a ReproducibleSignRateInfo object, storing various properties of two
+experimental replicates in terms of how well they agree.  Subexperiments
+for each parameter must be given explicitly in subexperiment_ids.</p>
+<p>If Yhat[i]==0, then parameter associated with index i is ignored (regardless of the associated rho value).</p>
+
+  <p><strong>Parameters:</strong></p>
+  <table>
+    <thead>
+      <tr>
+        <th>Name</th>
+        <th>Type</th>
+        <th>Description</th>
+        <th>Default</th>
+      </tr>
+    </thead>
+    <tbody>
+        <tr>
+          <td><code>logrho</code></td>
+          <td>
+                <code>N vector</code>
+          </td>
+          <td><p>confidence in a null hypothesis, expressed as a log p-value (from training replicate)</p></td>
+          <td>
+              <em>required</em>
+          </td>
+        </tr>
+        <tr>
+          <td><code>Yhat</code></td>
+          <td>
+                <code>N vector, int</code>
+          </td>
+          <td><p>estimate of the sign of a parameter theta (from training replicate)</p></td>
+          <td>
+              <em>required</em>
+          </td>
+        </tr>
+        <tr>
+          <td><code>Y</code></td>
+          <td>
+                <code>N vector, int</code>
+          </td>
+          <td><p>another estimate (from testing replicate)</p></td>
+          <td>
+              <em>required</em>
+          </td>
+        </tr>
+        <tr>
+          <td><code>subexperiment_ids</code></td>
+          <td>
+                <code>N vector</code>
+          </td>
+          <td><p>subexperiment for each parameter</p></td>
+          <td>
+              <em>required</em>
+          </td>
+        </tr>
+        <tr>
+          <td><code>n_thresholds</code></td>
+          <td>
+                <code>int</code>
+          </td>
+          <td><p>number of thresholds on logrho to use</p></td>
+          <td>
+                <code>1000</code>
+          </td>
+        </tr>
+    </tbody>
+  </table>
+
+  </div>
+
+</div><h2 id="reproduciblesignrateinfo">ReproducibleSignRateInfo</h2>
+
+
+<div class="doc doc-object doc-class">
+
+
+<a id="reproduciblesignrates.process.ReproducibleSignRateInfo"></a>
+  <div class="doc doc-contents first">
+
+  
+      <p>Stores various properties of two experimental replicates
+in terms of how well they agree.</p>
+
+  <p><strong>Attributes:</strong></p>
+  <table>
+    <thead>
+      <tr>
+        <th>Name</th>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+        <tr>
+          <td><code>logrho</code></td>
+          <td>
+                <code>N vector</code>
+          </td>
+          <td><p>confidence in null hypotheses (from training replicate)</p></td>
+        </tr>
+        <tr>
+          <td><code>Yhat</code></td>
+          <td>
+                <code>N vector</code>
+          </td>
+          <td><p>estimate of sign of parameters (from training replicate)</p></td>
+        </tr>
+        <tr>
+          <td><code>Yhat</code></td>
+          <td>
+                <code>N vector</code>
+          </td>
+          <td><p>estimate of sign of parameters (from testing replicate)</p></td>
+        </tr>
+        <tr>
+          <td><code>thresholds</code></td>
+          <td>
+                <code>L vector</code>
+          </td>
+          <td><p>different thresholds on logrho to use</p></td>
+        </tr>
+        <tr>
+          <td><code>subexperiment_ids</code></td>
+          <td>
+                <code>N vector</code>
+          </td>
+          <td><p>subexperiment assocaited with each parameter</p></td>
+        </tr>
+        <tr>
+          <td><code>RSP</code></td>
+          <td>
+                <code>L vector</code>
+          </td>
+          <td><p>reproducible sign proportion at each threshold</p></td>
+        </tr>
+        <tr>
+          <td><code>median_rejections</code></td>
+          <td>
+                <code>L vector</code>
+          </td>
+          <td><p>median rejections per subexperiment at each threshold</p></td>
+        </tr>
+    </tbody>
+  </table>
+
+
+
+  
+
+  <div class="doc doc-children">
+
+
+
+
+
+
+
+
+
+
+
+  </div>
+
+  </div>
+
+</div><h3 id="reproduciblesignrateinfoconfidence_interval">ReproducibleSignRateInfo.confidence_interval</h3>
+
+
+<div class="doc doc-object doc-function">
+
+
+<a id="reproduciblesignrates.process.ReproducibleSignRateInfo.confidence_interval"></a>
+  <div class="doc doc-contents first">
+  
+      <p>Computes confidence interval with (1-alpha) nominal coverage probability.
+Returns a lower and upper bound for each threshold in <code>self.thresholds</code>.</p>
+
+  <p><strong>Parameters:</strong></p>
+  <table>
+    <thead>
+      <tr>
+        <th>Name</th>
+        <th>Type</th>
+        <th>Description</th>
+        <th>Default</th>
+      </tr>
+    </thead>
+    <tbody>
+        <tr>
+          <td><code>alpha</code></td>
+          <td>
+                <code>float</code>
+          </td>
+          <td><p>one minus coverage probability</p></td>
+          <td>
+              <em>required</em>
+          </td>
+        </tr>
+        <tr>
+          <td><code>alternative</code></td>
+          <td>
+                <code>string</code>
+          </td>
+          <td><p>two-sided, lower-bound, or upper-bound</p></td>
+          <td>
+                <code>&#39;two-sided&#39;</code>
+          </td>
+        </tr>
+    </tbody>
+  </table>
+
+  </div>
+
+</div>
+              
+            </div>
+          </div><footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <!-- Copyright etc -->
+  </div>
+
+  Built with <a href="https://www.mkdocs.org/">MkDocs</a> using a <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
+</footer>
+          
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+
+  <div class="rst-versions" role="note" aria-label="Versions">
+  <span class="rst-current-version" data-toggle="rst-current-version">
+    
+    
+    
+  </span>
+</div>
+    <script>var base_url = '.';</script>
+    <script src="js/theme_extra.js" defer></script>
+    <script src="js/theme.js" defer></script>
+      <script src="javascripts/mathjax.js" defer></script>
+      <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js" defer></script>
+      <script src="search/main.js" defer></script>
+    <script defer>
+        window.onload = function () {
+            SphinxRtdTheme.Navigation.enable(true);
+        };
+    </script>
+
+</body>
+</html>
+
+<!--
+MkDocs version : 1.3.0
+Build Date UTC : 2022-08-02 18:09:08.282059+00:00
+-->
