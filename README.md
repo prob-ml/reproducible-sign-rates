@@ -14,7 +14,7 @@ Given data of this form, we assume the user can calculate three quantities of in
 
 This package uses $\rho,\hat Y,Y$ to visualize whether the two replicates yielded the same results.  It does so using a quantity called the **Reproducible Sign Proportion**, defined as
 
-$$\mathrm{RSP}(Y;\hat Y,\rho,\alpha) \triangleq \frac{\#\{i:\ \hat Y_i = Y_i,\ \rho_i\leq \alpha\}}{\#\{i:\ \rho_i\leq \alpha\}}$$
+$$\mathrm{RSP}(Y;\hat Y,\rho,\alpha) \triangleq \frac{|\{i:\ \hat Y_i = Y_i,\ \rho_i\leq \alpha\}|}{|{i:\ \rho_i\leq \alpha\}|}$$
 
 In some cases each experimental procedure includes many subexperiments, and each subexperiment is approximately independent.  With subexperiments, this package can be used to also estimate confidence interval for the **Reproducible Sign Rate**, defined as $\mathrm{RSR}(\hat Y,\rho,\alpha)\triangleq \mathbb{E}_Y[\mathrm{RSP}(Y;\hat Y,\rho,\alpha)]$.
 
