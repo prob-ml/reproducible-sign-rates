@@ -18,6 +18,20 @@ def _rsp(rejections,agreements):
 
 @dataclasses.dataclass
 class ReproducibleSignRateInfo:
+    '''
+    Stores various properties of two experimental replicates
+    in terms of how well they agree.
+
+    Attributes:
+        logrho (N vector): confidence in null hypotheses (from training replicate)
+        Yhat (N vector): estimate of sign of parameters (from training replicate)
+        Yhat (N vector): estimate of sign of parameters (from testing replicate)
+        thresholds (L vector): different thresholds on logrho to use
+        subexperiment_ids (N vector): subexperiment assocaited with each parameter
+        RSP (L vector): reproducible sign proportion at each threshold
+        median_rejections (L vector): median rejections per subexperiment at each threshold
+    '''
+
     logrho: np.ndarray
     Yhat: np.ndarray
     Y: np.ndarray
@@ -27,6 +41,7 @@ class ReproducibleSignRateInfo:
     def confidence_interval(self,alpha,alternative='two-sided'):
         '''
         Computes confidence interval with (1-alpha) nominal coverage probability.
+        Returns a lower and upper bound for each threshold in `self.thresholds`.
         '''
 
         if alternative=='two-sided':
@@ -97,8 +112,8 @@ def _check_sign_format(Y):
 
 def process_from_matrices(logrho,Yhat,Y,n_thresholds=1000):
     '''
-    Returns a ReproducibleSignRateInfo object, storing various properties of the two
-    experiments in terms of how well they agree.  Each row of logrho, Yhat, Y is assumed
+    Returns a ReproducibleSignRateInfo object, storing various properties of two
+    experimental replicates in terms of how well they agree.  Each row of logrho, Yhat, Y is assumed
     to correspond to a different subexperiment.
 
     If Yhat[i,j]==0, then parameter associated with index i,j is ignored (regardless of the associated rho value).
