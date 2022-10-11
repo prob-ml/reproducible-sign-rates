@@ -38,6 +38,11 @@ class ReproducibleSignRateInfo:
     subexperiment_ids: np.ndarray
     thresholds: np.ndarray
 
+    rejections_up: np.ndarray = None
+    rejections_down: np.ndarray = None
+    agreements_up: np.ndarray = None
+    agreements_down: np.ndarray = None
+
     def confidence_interval(self,alpha,alternative='two-sided'):
         '''
         Computes confidence interval with (1-alpha) nominal coverage probability.
@@ -69,8 +74,7 @@ class ReproducibleSignRateInfo:
         else:
             raise NotImplementedError(alternative)
 
-
-    def __post_init__(self):
+    def _compute_sweeps(self):
         subexperiments,subexperiment_idxs=np.unique(
             self.subexperiment_ids,return_inverse=True)
         self.n_subexperiments=len(subexperiments)
@@ -91,6 +95,11 @@ class ReproducibleSignRateInfo:
             self.agreements_up[i]=a_up
             self.agreements_down[i]=a_down
 
+    def __post_init__(self):
+        if self.rejections_up is None:
+            self._compute_sweeps()
+        else:
+            self.n_subexperiments,self.n_thresholds=self.rejections_up.shape
 
         self.agreements=self.agreements_up+self.agreements_down
         self.rejections=self.rejections_up+self.rejections_down
@@ -113,6 +122,24 @@ def _check_sign_format(Y):
         raise ValueError("Sign estimate vector may only contain values {-1,0,1}")
 
     return Y
+
+def _matrix_sweeps(logrho,Yhat,Y,thresholds):
+    shp=(logrho.shape[0],len(thresholds))
+    rejections_up=np.zeros(shp)
+    rejections_down=np.zeros(shp)
+    agreements_up=np.zeros(shp)
+    agreements_down=np.zeros(shp)
+
+    for i in range(shp[0]):
+        r_up,r_down,a_up,a_down=reproduciblesignrates.sweeps.sweep(
+            logrho[i],Yhat[i],
+            Y[i],thresholds)
+        rejections_up[i]=r_up
+        rejections_down[i]=r_down
+        agreements_up[i]=a_up
+        agreements_down[i]=a_down
+
+    return rejections_up,rejections_down,agreements_up,agreements_down
 
 def process_from_matrices(logrho,Yhat,Y,n_thresholds=1000):
     '''
@@ -154,7 +181,9 @@ def process_from_matrices(logrho,Yhat,Y,n_thresholds=1000):
         Yhat.ravel(),
         Y.ravel(),
         subexperiment_ids.ravel(),
-        thresholds)
+        thresholds,
+        *_matrix_sweeps(logrho,Yhat,Y,thresholds)
+    )
 
 def process(logrho,Yhat,Y,subexperiment_ids,n_thresholds=1000):
     '''
