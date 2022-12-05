@@ -24,22 +24,22 @@ In some cases each experimental procedure includes many subexperiments, and each
 
 This function processes $(\log \rho, \hat Y, Y)$ into an object which can be used for further processing.  It assumes the parameters (and $\rho,\hat Y,Y$) can be organized into a matrix where the values in each row come from different subexperiments.
 
-::: reproduciblesignrates.process.process_from_matrices
+::: reproduciblesignrates.processing.process_from_matrices
 
 ## process
 
 This function processes $(\log \rho, \hat Y, Y)$ into an object which can be used for further processing.  To use this function, one must explicitly specify the subexperiment associated with each parameter.
 
-::: reproduciblesignrates.process.process
+::: reproduciblesignrates.processing.process
 
 ## ReproducibleSignRateInfo
 
-::: reproduciblesignrates.process.ReproducibleSignRateInfo
+::: reproduciblesignrates.processing.ReproducibleSignRateInfo
     options:
       members: False
 
 ### ReproducibleSignRateInfo.confidence_interval
 
-::: reproduciblesignrates.process.ReproducibleSignRateInfo.confidence_interval
+::: reproduciblesignrates.processing.ReproducibleSignRateInfo.confidence_interval
 
 

@@ -1,2 +1,2 @@
 
-from reproduciblesignrates.process import process_from_matrices
+from reproduciblesignrates.processing import process_from_matrices,process
